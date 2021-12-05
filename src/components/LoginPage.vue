@@ -23,15 +23,20 @@
         </div>  
         <div class="login-container-grid" v-if="$root.state.userToken !== null">
             <div class="title-desc">
-                <img src=".././assets/logo.png" width="65" height="50">
+                <img  src=".././assets/logo.png" width="65" height="50">
                 <h1>A public platform building the definitive collection of coding questions and answers.</h1>
                 <button class="btn btn-primary big-btn" @click="gettingStart"><b>Getting start</b></button>
             </div>
             <div class="wrap-flex-login">
                 <h5>Welcome back {{ $root.state.userName }}</h5>
                 <div class="img-avatar">
-                    <img v-if="$root.state.avatarStatus.status === false" src=".././assets/user.png" alt="" width="150" height="150">
-                    <img v-if="$root.state.avatarStatus.status === true" :src="$root.state.avatarStatus.avatarPath" alt="" width="150" height="150">
+                    <div v-if="$root.state.avatarStatus.status === false">
+                        <img  src=".././assets/user.png" alt="" width="150" height="150">
+                    </div>
+                    <div v-if="$root.state.avatarStatus.status === true">
+                        <img class="avatar-border" :src="$root.state.avatarStatus.avatarPath" alt="" width="150" height="150">
+                    </div>
+                    
                 </div>
                 <button class="btn btn-primary logined-btn" @click="onUpdate"><b>Edit profile</b></button>
                 <button class="btn btn-danger logined-btn" @click="logOut"><b>Logout</b></button>
@@ -288,6 +293,26 @@ export default {
                 this.registerData.phoneNumber = '';
             } 
         }
+    },
+    mounted(){
+        console.log("mounted ==> ",this.$root.state.userToken )
+        if(this.$root.state.userToken !== null){
+            fetch('https://camt-twitterapi.pair-co.com/me',{
+                method:"GET",
+                headers:{
+                    "Access-Control-Allow-Origin": "*",
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + this.$root.state.userToken
+                }
+            }).then(res => res.json()).then( (data) => {
+                this.$root.state.avatarStatus.status = true
+                this.$root.state.avatarStatus.avatarPath = data.avatar
+                console.log(this.$root.state.avatarStatus.status)
+                console.log(this.$root.state.avatarStatus.avatarPath)
+            }).catch(err => {
+                console.log(err)
+            })
+        }
     }
     
 }
@@ -451,5 +476,9 @@ export default {
 .register-container{
     text-align: center;
     color: rgb(10, 80, 10);
+}
+
+.avatar-border{
+    border-radius: 50%;
 }
 </style>
